@@ -163,10 +163,10 @@ const BlogPublisher = ({ onNavigate }: BlogPublisherProps) => {
           <div className="w-16 h-16 bg-gradient-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <Plus className="w-8 h-8 text-primary" />
           </div>
-          <h3 className="font-semibold mb-2">Create Educational Content</h3>
-          <p className="text-gray-500 mb-4">
-            Share insights, fact-checks, and educational articles with the community
-          </p>
+              <h3 className="font-semibold mb-2">Create Governance & Political Content</h3>
+              <p className="text-muted-foreground mb-4">
+                Share insights on Kenyan politics, governance, law, and justice ahead of 2027 elections
+              </p>
           <Button 
             onClick={() => setIsCreateOpen(true)}
             className="bg-gradient-primary"
@@ -203,15 +203,15 @@ const BlogPublisher = ({ onNavigate }: BlogPublisherProps) => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="elections">Elections</SelectItem>
-                  <SelectItem value="governance">Governance</SelectItem>
-                  <SelectItem value="health">Health</SelectItem>
-                  <SelectItem value="security">Security</SelectItem>
-                  <SelectItem value="economy">Economy</SelectItem>
-                  <SelectItem value="education">Education</SelectItem>
-                  <SelectItem value="environment">Environment</SelectItem>
-                  <SelectItem value="social">Social</SelectItem>
-                  <SelectItem value="technology">Technology</SelectItem>
+                  <SelectItem value="elections">2027 Elections</SelectItem>
+                  <SelectItem value="governance">Kenyan Governance</SelectItem>
+                  <SelectItem value="politics">Political Analysis</SelectItem>
+                  <SelectItem value="justice">Justice & Courts</SelectItem>
+                  <SelectItem value="parliament">Parliament & Laws</SelectItem>
+                  <SelectItem value="security">National Security</SelectItem>
+                  <SelectItem value="economy">Economic Policy</SelectItem>
+                  <SelectItem value="corruption">Anti-Corruption</SelectItem>
+                  <SelectItem value="constitution">Constitutional Matters</SelectItem>
                   <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
@@ -242,7 +242,7 @@ const BlogPublisher = ({ onNavigate }: BlogPublisherProps) => {
               <Input
                 value={form.tags}
                 onChange={(e) => setForm({ ...form, tags: e.target.value })}
-                placeholder="fact-check, elections, governance (comma separated)"
+                placeholder="kenya-2027, politics, governance, fact-check (comma separated)"
               />
             </div>
 

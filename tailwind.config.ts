@@ -81,7 +81,9 @@ export default {
 			backgroundImage: {
 				'gradient-primary': 'var(--gradient-primary)',
 				'gradient-hero': 'var(--gradient-hero)',
-				'gradient-card': 'var(--gradient-card)'
+				'gradient-card': 'var(--gradient-card)',
+				'gradient-engaging': 'var(--gradient-engaging)',
+				'gradient-kenya': 'var(--gradient-kenya)'
 			},
 			boxShadow: {
 				'truth': 'var(--shadow-truth)',

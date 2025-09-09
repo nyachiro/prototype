@@ -24,6 +24,8 @@ export interface Claim {
   aiAnalyzed?: boolean;
   aiPendingApproval?: boolean;
   publishedToFeed?: boolean;
+  duplicateOf?: string;
+  duplicateCount?: number;
 }
 
 export type ClaimCategory = 

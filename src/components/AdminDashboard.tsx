@@ -13,6 +13,7 @@ import { storageUtils } from "@/utils/storage";
 import { Claim } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import AIApprovalSection from "./AIApprovalSection";
+import AdminArticlePublisher from "./AdminArticlePublisher";
 
 interface AdminDashboardProps {
   user: User;
@@ -106,7 +107,7 @@ const AdminDashboard = ({ user, onLogout }: AdminDashboardProps) => {
   return (
     <div className="flex flex-col h-full bg-white">
       {/* Header */}
-      <div className="bg-gradient-primary px-6 py-4">
+      <div className="bg-gradient-engaging px-6 py-4 shadow-elevated">
         <div className="flex items-center justify-between text-white">
           <div>
             <h1 className="text-xl font-bold">Fact-Checker Dashboard</h1>
@@ -131,6 +132,7 @@ const AdminDashboard = ({ user, onLogout }: AdminDashboardProps) => {
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="claims">Claims Management</TabsTrigger>
             <TabsTrigger value="content">Content Management</TabsTrigger>
+            <TabsTrigger value="publish">Publish Articles</TabsTrigger>
           </TabsList>
           
           <TabsContent value="overview" className="flex-1 p-6">
@@ -211,15 +213,22 @@ const AdminDashboard = ({ user, onLogout }: AdminDashboardProps) => {
             </div>
 
             {/* Claims List */}
-            <div className="space-y-3 max-h-96 overflow-y-auto">
+            <div className="space-y-3 max-h-96 overflow-hidden hover:overflow-y-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
               {filteredClaims.map((claim) => (
                 <Card key={claim.id} className="p-4">
                   <div className="flex items-start gap-3">
                     {getStatusIcon(claim.status)}
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-gray-700 mb-2 line-clamp-2">{claim.content}</p>
-                      <div className="flex items-center justify-between mb-2">
-                        {getStatusBadge(claim.status)}
+                       <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          {getStatusBadge(claim.status)}
+                          {claim.duplicateCount && claim.duplicateCount > 1 && (
+                            <Badge variant="outline" className="text-xs">
+                              {claim.duplicateCount} submissions
+                            </Badge>
+                          )}
+                        </div>
                         <span className="text-xs text-gray-500">{claim.submittedAt}</span>
                       </div>
                       {claim.verdict && (
@@ -254,6 +263,10 @@ const AdminDashboard = ({ user, onLogout }: AdminDashboardProps) => {
 
           <TabsContent value="content" className="flex-1 p-6">
             <AIApprovalSection />
+          </TabsContent>
+
+          <TabsContent value="publish" className="flex-1 p-6">
+            <AdminArticlePublisher onNavigate={(view) => {}} />
           </TabsContent>
         </Tabs>
       </div>

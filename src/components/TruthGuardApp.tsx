@@ -20,9 +20,10 @@ import LeaderboardSection from "./LeaderboardSection";
 import SocialShare from "./SocialShare";
 import BookmarkSection from "./BookmarkSection";
 import BlogPublisher from "./BlogPublisher";
+import AdminArticlePublisher from "./AdminArticlePublisher";
 
 const TruthGuardApp = () => {
-  const [currentView, setCurrentView] = useState<"home" | "submit" | "claims" | "detail" | "trending" | "blog" | "profile" | "quiz" | "leaderboard" | "bookmarks" | "publish">("home");
+  const [currentView, setCurrentView] = useState<"home" | "submit" | "claims" | "detail" | "trending" | "blog" | "profile" | "quiz" | "leaderboard" | "bookmarks" | "publish" | "admin-publisher">("home");
   const [selectedClaim, setSelectedClaim] = useState<Claim | null>(null);
   const [selectedBlogPost, setSelectedBlogPost] = useState<BlogPost | null>(null);
   const [claimText, setClaimText] = useState("");
@@ -721,6 +722,11 @@ const TruthGuardApp = () => {
   // Blog Publisher View
   if (currentView === "publish") {
     return <BlogPublisher onNavigate={(view) => setCurrentView(view as any)} />;
+  }
+
+  // Admin Article Publisher View
+  if (currentView === "admin-publisher") {
+    return <AdminArticlePublisher onNavigate={(view) => setCurrentView(view as any)} />;
   }
 
   return null;

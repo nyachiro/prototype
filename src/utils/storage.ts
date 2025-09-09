@@ -1,4 +1,5 @@
 import { Claim, Notification, BlogPost, TrendingTopic, ClaimCategory, UserProfile, Quiz } from "@/types";
+import { findSimilarClaims, updateClaimWithDuplicates } from './claimSimilarity';
 
 export const storageUtils = {
   getClaims: (): Claim[] => {
@@ -10,8 +11,34 @@ export const storageUtils = {
     localStorage.setItem('truthguard_claims', JSON.stringify(claims));
   },
   
-  addClaim: (claim: Omit<Claim, 'id' | 'submittedAt' | 'status' | 'priority' | 'views' | 'likes' | 'shares' | 'approved' | 'bookmarkedBy' | 'aiAnalyzed' | 'aiPendingApproval' | 'publishedToFeed'>) => {
+  addClaim: (claim: Omit<Claim, 'id' | 'submittedAt' | 'status' | 'priority' | 'views' | 'likes' | 'shares' | 'approved' | 'bookmarkedBy' | 'aiAnalyzed' | 'aiPendingApproval' | 'publishedToFeed' | 'duplicateOf' | 'duplicateCount'>) => {
     const claims = storageUtils.getClaims();
+    
+    // Check for similar claims
+    const similarClaims = findSimilarClaims(claim.content, claims);
+    
+    if (similarClaims.length > 0) {
+      // If similar claims exist, increment count on the original
+      const originalClaim = similarClaims[0];
+      const updatedClaims = claims.map(c => 
+        c.id === originalClaim.id 
+          ? { ...c, duplicateCount: (c.duplicateCount || 1) + 1 }
+          : c
+      );
+      storageUtils.setClaims(updatedClaims);
+      
+      // Still add notification for user
+      storageUtils.addNotification({
+        userId: claim.submittedBy,
+        claimId: originalClaim.id,
+        type: 'claim_approved',
+        title: 'Similar Claim Found',
+        message: 'Your claim was similar to an existing one. You\'ll be notified when it\'s reviewed.',
+        read: false
+      });
+      return originalClaim;
+    }
+    
     const newClaim: Claim = {
       ...claim,
       id: Date.now().toString(),
@@ -25,7 +52,8 @@ export const storageUtils = {
       bookmarkedBy: [],
       aiAnalyzed: false,
       aiPendingApproval: false,
-      publishedToFeed: false
+      publishedToFeed: false,
+      duplicateCount: 1
     };
     
     claims.unshift(newClaim);
@@ -46,27 +74,31 @@ export const storageUtils = {
   
   updateClaim: (id: string, updates: Partial<Claim>) => {
     const claims = storageUtils.getClaims();
-    const index = claims.findIndex(c => c.id === id);
-    if (index !== -1) {
-      const oldClaim = claims[index];
-      claims[index] = { ...claims[index], ...updates };
-      storageUtils.setClaims(claims);
+    const updatedClaims = updateClaimWithDuplicates(id, claims, updates);
+    storageUtils.setClaims(updatedClaims);
+    
+    const primaryClaim = claims.find(c => c.id === id);
+    
+    // Send notification when verdict is published  
+    if (updates.verdict && updates.status !== 'pending' && primaryClaim?.status === 'pending') {
+      const similarClaims = findSimilarClaims(primaryClaim?.content || '', claims);
       
-      // Send notification when verdict is published
-      if (updates.verdict && updates.status !== 'pending' && oldClaim.status === 'pending') {
-        storageUtils.addNotification({
-          userId: oldClaim.submittedBy,
-          claimId: id,
-          type: 'verdict_published',
-          title: 'Verdict Published',
-          message: `Your claim has been fact-checked: ${updates.status}`,
-          read: false
-        });
-      }
-      
-      return claims[index];
+      // Notify all users who submitted similar claims
+      [primaryClaim, ...similarClaims].forEach(claim => {
+        if (claim) {
+          storageUtils.addNotification({
+            userId: claim.submittedBy,
+            claimId: claim.id,
+            type: 'verdict_published',
+            title: 'Verdict Published',
+            message: `A claim similar to yours has been fact-checked: ${updates.status}`,
+            read: false
+          });
+        }
+      });
     }
-    return null;
+    
+    return updatedClaims.find(c => c.id === id) || null;
   },
   
   deleteClaim: (id: string) => {
